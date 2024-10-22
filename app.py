@@ -4,6 +4,10 @@ import os
 
 app = Flask(__name__)
 
+@app.route('/', methods=['GET'])
+def home():
+    return jsonify({"message": "Welcome to the YouTube Video Downloader API! Use the /download endpoint to download videos."})
+
 @app.route('/download', methods=['POST'])
 def download_video():
     video_url = request.json.get('url')
