@@ -24,23 +24,26 @@ def download_video():
 
         ydl_opts = {
             'format': 'bestvideo+bestaudio/best',
-            'outtmpl': './downloads/%(title)s.%(ext)s',  # Path for download
-            'merge_output_format': 'mp4',  # Set to merge into an MP4 file
+            'outtmpl': './downloads/%(title)s.%(ext)s',
+            'merge_output_format': 'mp4'
         }
 
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(video_url, download=True)
-            
-            # Handle the case where 'ext' might not be available
-            ext = info.get('ext', 'mp4')
-            video_file = f"./downloads/{info['title']}.{ext}"
-
-            # Return the downloaded file
+            video_file = f"./downloads/{info['title']}.{info['ext']}"
             return send_file(video_file, as_attachment=True)
-    
+
+    except yt_dlp.utils.DownloadError as e:
+        error_message = str(e)
+        if "Sign in to confirm you’re not a bot" in error_message:
+            return jsonify({"error": "This video requires sign-in or CAPTCHA verification. Please download manually from YouTube."}), 403
+        else:
+            return jsonify({"error": "An error occurred while downloading the video."}), 500
+
     except Exception as e:
-        print(f"Error: {str(e)}")  # Log the error for debugging
-        return jsonify({"error": "Failed to download the video. Please try again later."}), 500
+        print(f"Error: {str(e)}")  # Log the error
+        return jsonify({"error": str(e)}), 500
+
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
