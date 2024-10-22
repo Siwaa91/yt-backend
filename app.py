@@ -4,7 +4,7 @@ import yt_dlp
 import os
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, resources={r"/download": {"origins": "https://youtube-downloader21.netlify.app"}})
 
 # Function to download a single video from a YouTube link
 def download_video(video_url, output_path='.'):
